@@ -1,14 +1,18 @@
+REALIZADO POR: Juan chaustre, Santiago Carrasquero y Eric Vargas
 
-REALIZADO POR: Juan Chaustre, Santiago Carrasquero y Eric Vargas
 
-csv-lib
-Librería Java extensible para el procesamiento de archivos CSV mediante los métodos de un objeto, desarrollada siguiendo los principios SOLID.
+# csv-lib
 
-Requisitos
-Java 17 o superior
-Maven 3.8+
+Librería Java **extensible** para el procesamiento de archivos CSV mediante los métodos de un objeto, desarrollada siguiendo los principios **SOLID**.
 
-Estructura del proyecto
+## Requisitos
+
+- Java 17 o superior
+- Maven 3.8+
+
+## Estructura del proyecto
+
+```
 csv-lib/
 ├── pom.xml
 ├── README.md
@@ -33,10 +37,26 @@ csv-lib/
         ├── MayusculasProcessorDecorator.java
         ├── LoggerProcessorDecorator.java
         └── ParserPuntoYComa.java
-Compilar y ejecutar
+```
+
+## Compilar y ejecutar
+
+al clonar el repositorio, entramos a la carpeta interna que contiene los archivos de configuracion
+con el comando 
+
+cd POO/csv-lib/csv-lib
+
+una vez que estemos dentro de la carpeta, compilamos el archivo con el comando 
+
 mvn compile
-mvn exec:java
-Uso básico de la librería
+
+y por ultimo para ejecutarlo, usamos el comando
+
+mvn exec:java "-Dexec.mainClass=com.universidad.csvlib.Main"
+
+## Uso básico de la librería
+
+```java
 CSVProcessor procesador = new BaseCSVProcessor(new DefaultCSVParser(), new ConsoleCSVPrinter());
 
 // Cargar un archivo
@@ -52,28 +72,41 @@ procesador.eliminarColumna("Carrera");
 
 // Imprimir en pantalla
 procesador.imprimir();
-Cómo extender la librería SIN modificar su código base
-La librería fue diseñada para que nunca sea necesario tocar sus clases para agregarle comportamiento nuevo. Existen dos puntos de extensión:
+```
 
-1. Nueva forma de leer archivos → implementar CSVParser
-Si necesitás soportar otro formato (otro separador, otra codificación, con comillas, etc.), creá tu propia clase que implemente CSVParser (o que extienda DefaultCSVParser, como en el ejemplo):
+## Cómo extender la librería SIN modificar su código base
 
+La librería fue diseñada para que **nunca sea necesario tocar sus clases** para agregarle comportamiento nuevo. Existen dos puntos de extensión:
+
+### 1. Nueva forma de leer archivos → implementar `CSVParser`
+
+Si necesitás soportar otro formato (otro separador, otra codificación, con comillas, etc.), creá tu propia clase que implemente `CSVParser` (o que extienda `DefaultCSVParser`, como en el ejemplo):
+
+```java
 public class ParserPuntoYComa extends DefaultCSVParser {
     public ParserPuntoYComa() {
         super(";");
     }
 }
+```
+
 Y usala igual que cualquier otro parser:
 
+```java
 CSVProcessor procesador = new BaseCSVProcessor(new ParserPuntoYComa(), new ConsoleCSVPrinter());
-2. Nueva forma de mostrar la tabla → implementar CSVPrinter
-Igual que con el parser, para agregar una salida en otro formato (Markdown, HTML, JSON, etc.) alcanza con implementar la interfaz CSVPrinter y pasarla al BaseCSVProcessor.
+```
 
-3. Modificar o enriquecer el comportamiento de cualquier método → extender CSVProcessorDecorator
-Este es el punto de extensión más potente: permite envolver un CSVProcessor ya existente y sobrescribir únicamente los métodos que te interesa modificar, dejando el resto igual.
+### 2. Nueva forma de mostrar la tabla → implementar `CSVPrinter`
+
+Igual que con el parser, para agregar una salida en otro formato (Markdown, HTML, JSON, etc.) alcanza con implementar la interfaz `CSVPrinter` y pasarla al `BaseCSVProcessor`.
+
+### 3. Modificar o enriquecer el comportamiento de cualquier método → extender `CSVProcessorDecorator`
+
+Este es el punto de extensión más potente: permite envolver un `CSVProcessor` ya existente y sobrescribir únicamente los métodos que te interesa modificar, dejando el resto igual.
 
 Ejemplo — convertir todos los datos a mayúsculas después de cargarlos:
 
+```java
 public class MayusculasProcessorDecorator extends CSVProcessorDecorator {
     public MayusculasProcessorDecorator(CSVProcessor componente) {
         super(componente);
@@ -86,11 +119,16 @@ public class MayusculasProcessorDecorator extends CSVProcessorDecorator {
         return tabla;
     }
 }
+```
+
 Uso, incluso combinando varios decoradores entre sí:
 
+```java
 CSVProcessor procesador = new LoggerProcessorDecorator(
                                 new MayusculasProcessorDecorator(
                                     new BaseCSVProcessor(new DefaultCSVParser(), new ConsoleCSVPrinter())));
-En ningún caso hace falta editar BaseCSVProcessor.java ni ninguna otra clase de la librería: todo el código nuevo vive fuera de ella (en este repositorio, dentro del paquete ejemplos, a modo de muestra).
+```
+
+En ningún caso hace falta editar `BaseCSVProcessor.java` ni ninguna otra clase de la librería: todo el código nuevo vive fuera de ella (en este repositorio, dentro del paquete `ejemplos`, a modo de muestra).
 
 desarrollo de librería extensible en Java siguiendo principios SOLID.
